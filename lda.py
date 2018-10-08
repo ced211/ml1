@@ -47,21 +47,21 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 		# ====================
 
 		nb_samples = len(y)
-		prop = np.zeros(2) # Binary output supposed
-		mean = np.zeros((2,len(X[0])))
+		prop = np.zeros(2) # Binary output supposed (Marginal probability for both class)
+		mean = np.zeros((2,len(X[0]))) # Mean attrubute values for both class
 
 		i = 0
 		for sample in y:
-			if sample == 0.0:
+			if sample == 0.: # First class
 				prop[0]+=1
 				mean[0]+=X[i]
-			else:
+			else:			 # Second class
 				prop[1]+=1
 				mean[1]+=X[i]
 			i+=1
 
 		for i in range(2):
-			mean[i]/=prop[0]
+			mean[i]/=prop[i]
 			prop[i]/=nb_samples
 
 		cov = np.cov(X, None, False)
@@ -99,7 +99,7 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 				densities[k] = self.f(sample[k], k)
 
 			den = np.dot(self.prop, densities)
-			if (densities[0]*prop[0]/den) > (densities[1]*prop[1]/den) : # Search of the Maximum
+			if (densities[0]*self.prop[0]/den) > (densities[1]*self.prop[1]/den) : # Search of the Maximum
 				y.append(0.0)
 			else:
 				y.append(1.0)
@@ -158,3 +158,4 @@ if __name__ == "__main__":
 	lda = LinearDiscriminantAnalysis()
 	lda.fit(train_set[0],train_set[1])
 	p2 = lda.predict_proba(test_set[0])
+	print(p2)
