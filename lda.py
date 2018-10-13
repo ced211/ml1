@@ -87,10 +87,7 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 		y : array of shape = [n_samples]
 			The predicted classes, or the predict values.
 		"""
-
-		# ====================
-		# TODO your code here.
-		# ====================
+		
 		n_features = len(X[0])
 		y = []
 		densities = np.zeros(n_features)
@@ -123,9 +120,6 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 			by lexicographic order.
 		"""
 
-		# ====================
-		# TODO your code here.
-		# ====================
 		(n_sample, n_features) = X.shape
 		p = np.empty([n_sample,2])
 		num = np.zeros(n_features)
@@ -145,23 +139,55 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 		return p
 
 if __name__ == "__main__":
-	from data import make_dataset1, make_dataset2
-	from plot import plot_boundary
 
 	# 1st dataset
 	train_set = make_dataset1(1200, 565354)
-	test_set = make_dataset1(300, 156)
 	lda = LinearDiscriminantAnalysis()
 	lda.fit(train_set[0],train_set[1])
 	plot_boundary('lda_trainDataset1', lda, train_set[0], train_set[1])
-	plot_boundary('lda_testDataset1', lda, test_set[0], test_set[1])
-	# p1 = lda.predict_proba(test_set[0])
 
-	#2nd dataset
+	# 2nd dataset
 	train_set = make_dataset2(1200, 565354)
-	test_set = make_dataset2(300, 156)
 	lda = LinearDiscriminantAnalysis()
 	lda.fit(train_set[0],train_set[1])
 	plot_boundary('lda_trainDataset2', lda, train_set[0], train_set[1])
-	plot_boundary('lda_testDataset2', lda, test_set[0], test_set[1])
-	# p2 = lda.predict_proba(test_set[0])
+
+	# Accuracy and std for five generations of different seeds
+
+	accuracy1 = np.zeros(5)
+	accuracy2 = np.zeros(5)
+
+	seed = 10000 # Will change for each generation
+	for i in range(5):
+		(train_set1,test_set1) =  (make_dataset1(1200, seed), make_dataset1(300, seed))
+		(train_set2,test_set2) =  (make_dataset2(1200, seed), make_dataset2(300, seed))
+		
+		(lda1, lda2) = (LinearDiscriminantAnalysis(), LinearDiscriminantAnalysis())
+		
+		lda1.fit(train_set1[0], train_set1[1])
+		lda2.fit(train_set2[0], train_set2[1])
+		
+		predict1 = lda1.predict(test_set1[0])
+		predict2 = lda2.predict(test_set2[0])
+		
+		for j in range(300):
+			if predict1[j] == test_set1[1][j]:
+				accuracy1[i]+=1
+			if predict2[j] == test_set2[1][j]:
+				accuracy2[i]+=1
+				
+		seed+=seed
+	
+	(mean1, mean2) = (np.mean(accuracy1), np.mean(accuracy2))
+	(std1, std2) = (np.std(accuracy1), np.std(accuracy2))
+	
+	# Display of the results
+	print('Dataset 1:')
+	print(accuracy1)
+	print('mean: ' + str(mean1) + '   std: ' + str(std1))
+	print('mean%: ' + str(mean1/300) + '   std%: ' + str(std1/300))
+	print()
+	print('Dataset 2:')
+	print(accuracy2)
+	print('mean: ' + str(mean2) + '   std: ' + str(std2))
+	print('mean%: ' + str(mean2/300) + '   std%: ' + str(std2/300))
