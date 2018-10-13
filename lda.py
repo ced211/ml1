@@ -8,6 +8,8 @@ Project 1 - Classification algorithms
 
 import numpy as np
 import math
+from plot import plot_boundary
+from data import make_dataset1, make_dataset2
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 
@@ -124,11 +126,12 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 		# ====================
 		# TODO your code here.
 		# ====================
-		n_features = len(X[0])
-		p = []
+		(n_sample, n_features) = X.shape
+		p = np.empty([n_sample,2])
 		num = np.zeros(n_features)
 		densities = np.zeros(n_features)
 
+		i=0
 		for sample in X:    
 			
 			for k in range(n_features):
@@ -136,9 +139,9 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 				num[k] = densities[k]*self.prop[k]
 
 			den = np.dot(self.prop, densities)
-			p.append( num/den )
-
-
+			p[i] = num/den
+			i+=1
+			
 		return p
 
 if __name__ == "__main__":
@@ -150,12 +153,15 @@ if __name__ == "__main__":
 	test_set = make_dataset1(300, 156)
 	lda = LinearDiscriminantAnalysis()
 	lda.fit(train_set[0],train_set[1])
-	p1 = lda.predict_proba(test_set[0])
+	plot_boundary('lda_trainDataset1', lda, train_set[0], train_set[1])
+	plot_boundary('lda_testDataset1', lda, test_set[0], test_set[1])
+	# p1 = lda.predict_proba(test_set[0])
 
 	#2nd dataset
 	train_set = make_dataset2(1200, 565354)
 	test_set = make_dataset2(300, 156)
 	lda = LinearDiscriminantAnalysis()
 	lda.fit(train_set[0],train_set[1])
-	p2 = lda.predict_proba(test_set[0])
-	print(p2)
+	plot_boundary('lda_trainDataset2', lda, train_set[0], train_set[1])
+	plot_boundary('lda_testDataset2', lda, test_set[0], test_set[1])
+	# p2 = lda.predict_proba(test_set[0])
