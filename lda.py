@@ -68,7 +68,7 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 
 		cov = np.cov(X, None, False)
 
-		# Statement formula
+		# Statement formula for 2 classes
 		self.f = lambda x, k : (2* math.pi * math.sqrt(np.linalg.det(cov)))**-1 * np.exp(-0.5 * np.dot( np.dot( (x - mean[k]), np.linalg.inv(cov)), (x - mean[k]) )) 
 		self.prop = prop
 
@@ -88,14 +88,14 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 			The predicted classes, or the predict values.
 		"""
 		
-		n_features = len(X[0])
+		n_class = 2
 		y = []
-		densities = np.zeros(n_features)
+		densities = np.zeros(n_class)
 
 		for sample in X:
 			
-			for k in range(n_features):
-				densities[k] = self.f(sample[k], k)
+			for k in range(n_class):
+				densities[k] = self.f(sample, k)
 
 			den = np.dot(self.prop, densities)
 			if (densities[0]*self.prop[0]/den) > (densities[1]*self.prop[1]/den) : # Search of the Maximum
@@ -120,16 +120,16 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 			by lexicographic order.
 		"""
 
-		(n_sample, n_features) = X.shape
-		p = np.empty([n_sample,2])
-		num = np.zeros(n_features)
-		densities = np.zeros(n_features)
+		(n_sample, n_class) = (X.shape[0], 2)
+		p = np.empty([n_sample, n_class])
+		num = np.zeros(n_class)
+		densities = np.zeros(n_class)
 
 		i=0
 		for sample in X:    
 			
-			for k in range(n_features):
-				densities[k] = self.f(sample[k], k)
+			for k in range(n_class):
+				densities[k] = self.f(sample, k)
 				num[k] = densities[k]*self.prop[k]
 
 			den = np.dot(self.prop, densities)
