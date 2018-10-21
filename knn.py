@@ -21,13 +21,14 @@ from data import make_dataset1, make_dataset2
 
 if __name__ == "__main__":
     pass 
-    n_table = range(1,1301,100)
+    inFile = set()
+    n_table = [1,5,25,125,625,1200]
     print(n_table)
-    data = make_dataset2(1500,2048)
+    data = make_dataset2(1500,1918)
     scores = {}
     mean = {}
     var = {}      
-    with open('knn_score', 'w') as f:
+    with open('knn_score.csv', 'w') as f:
         for n in n_table:
 
             # part 1
@@ -37,18 +38,19 @@ if __name__ == "__main__":
       
             #part 2
             scores[n] = cross_val_score(estimator,data[0],data[1],cv = 10)
-            f.write("K = " + str(n))
+            inFile.add(n)
+            f.write(str(n))
             #f.write(str(scores[n]))
-            f.write(" mean: ")
+            f.write(",")
             f.write(str(np.mean(scores[n])))
-            f.write("var: ")
+            f.write(",")
             f.write(str(np.var(scores[n]) ) + "\n")
 
         #part3
 
         #desired accuracy
         delta_mean = 0.01
-        delta_var = 0.0001
+        delta_var = delta_mean**2
 
         #create 4 points of interest equally spaced.
         points = list(range(4))
@@ -85,6 +87,14 @@ if __name__ == "__main__":
                     if mean[points[i]] > best_mean:
                         best_mean  = mean[points[i]]
                         best_k = i
+            for i in range(4):
+                if points[i] not in inFile:
+                    f.write(str(points[i]))
+                    f.write(",")
+                    f.write(str(mean[points[i]]))
+                    f.write(",")
+                    f.write(str(var[points[i]]) + "\n")  
+                    inFile.add(points[i])           
             #update the point of interest
             print("var: " + str(best_var) + " mean: " + str(best_mean))
             print(best_k)
@@ -97,3 +107,9 @@ if __name__ == "__main__":
                 points[3] = points[best_k + 1]
             points[1] = points[0] + (points[3] - points[0]) // 3
             points[2] = points[3] - (points[3] - points[0]) // 3  
+        estimator = KNeighborsClassifier(n_neighbors = 250).fit(data[0],data[1])
+        scores[300] = cross_val_score(estimator,data[0],data[1],cv = 10)
+        print(scores[300])
+        print(np.mean(scores[300]))
+        print(np.var(scores[300]))
+        
