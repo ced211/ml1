@@ -18,8 +18,8 @@ from sklearn.model_selection import StratifiedKFold
 
 
 if __name__ == "__main__":
-    n_table = [1, 5, 25, 125, 625]
-    data = make_dataset2(1500, 21)
+    n_table = [1, 5, 25, 125, 300, 625,1200]
+    data = make_dataset2(1500, 1997)
     scores = {}
     mean = {}
     var = {}
@@ -30,13 +30,19 @@ if __name__ == "__main__":
         print("computing" + str(n))
         plot_boundary("knn_" + str(n), estimator, data[0], data[1])
 
-        # part 2
         scores[n] = cross_val_score(
             estimator, data[0], data[1], cv=10).tolist()
+        for i in range(9):
+            cv = StratifiedKFold(n_splits=10, random_state=i, shuffle=True)
+            scores[n].extend(cross_val_score(
+                estimator, data[0], data[1], cv=cv).tolist())
+        print(len(scores[n]))
         mean[n] = np.mean(scores[n])
         var[n] = np.var(scores[n])
+    print("mean" + str(mean))
+    print("var" + str(var))
 
-    # part3
+    # part2
     # desired accuracy
     delta_mean = 0.01
     delta_var = delta_mean**2
@@ -92,4 +98,3 @@ if __name__ == "__main__":
             points[3] = points[best_k + 1]
         points[1] = points[0] + (points[3] - points[0]) // 3
         points[2] = points[3] - (points[3] - points[0]) // 3
-        
